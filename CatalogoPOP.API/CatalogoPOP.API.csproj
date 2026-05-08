@@ -1,0 +1,22 @@
+<!-- O que esse arquivo faz: Define que esse é um projeto de Web API com Minimal APIs. (Endpoints, JWT, Rate Limiters).-->
+
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.4" />
+    <PackageReference Include="Scrutor" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CatalogoPOP.Application\CatalogoPOP.Application.csproj" />
+    <ProjectReference Include="..\CatalogoPOP.Infrastructure\CatalogoPOP.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

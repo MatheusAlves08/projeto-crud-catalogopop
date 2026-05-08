@@ -1,0 +1,11 @@
+﻿<!-- O que esse arquivo faz: Define que esse é um projeto de biblioteca de classes. (Regras de negócio, Entidades e Interfaces).-->
+
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
