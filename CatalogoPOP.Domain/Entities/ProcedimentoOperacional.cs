@@ -51,7 +51,7 @@ public class ProcedimentoOperacional
     }
 
     /// <summary>
-    /// Método para atualizar os dados do Procedimento.
+    /// Método para atualizar os dados do Procedimento. 
     /// Aqui também aplicamos a regra de versionamento automático.
     /// </summary>
     public void Atualizar(string titulo, string descricao, Departamento departamento, StatusProcedimento status, string responsavel)
