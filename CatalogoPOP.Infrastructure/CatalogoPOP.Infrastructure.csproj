@@ -1,4 +1,4 @@
-﻿<!-- O que esse arquivo faz: Define que esse é um projeto de biblioteca de classes. Ele gerencia a comunicação com o banco de dados, os repositórios e as entidades.-->
+<!-- O que esse arquivo faz: Define que esse é um projeto de biblioteca de classes. Ele gerencia a comunicação com o banco de dados, os repositórios e as entidades.-->
 
 <Project Sdk="Microsoft.NET.Sdk">
 
@@ -7,7 +7,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.7">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.4">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
