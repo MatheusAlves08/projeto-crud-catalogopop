@@ -3,4 +3,5 @@
   <Project Path="CatalogoPOP.Application/CatalogoPOP.Application.csproj" />
   <Project Path="CatalogoPOP.Domain/CatalogoPOP.Domain.csproj" />
   <Project Path="CatalogoPOP.Infrastructure/CatalogoPOP.Infrastructure.csproj" />
+  <Project Path="CatalogoPOP.Tests/CatalogoPOP.Tests.csproj" />
 </Solution>

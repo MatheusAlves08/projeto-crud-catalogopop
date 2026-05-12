@@ -1,0 +1,34 @@
+<!-- O que esse arquivo faz: Define o projeto de TESTES UNITÁRIOS.
+     Testes unitários validam o comportamento de uma unidade de código (ex: uma entidade, um método)
+     de forma isolada, sem banco de dados e sem dependências externas.
+     Pacotes usados:
+       - xUnit: o framework de testes mais popular no ecossistema .NET.
+       - FluentAssertions: deixa as verificações (asserts) mais legíveis e expressivas.
+       - coverlet: mede a cobertura de código (quantos % do código está testado).
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="FluentAssertions" Version="6.12.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CatalogoPOP.Domain\CatalogoPOP.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
