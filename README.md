@@ -72,48 +72,33 @@ O projeto utiliza **Clean Architecture** (Arquitetura Limpa), que organiza o có
 ```
 projeto-crud-catalogopop/
 │
-├── 💎 CatalogoPOP.Domain/
-│   ├── Entities/
-│   │   └── ProcedimentoOperacional.cs   # Entidade principal com regras de negócio
-│   ├── Enums/
-│   │   ├── Departamento.cs              # Enum de departamentos
-│   │   └── StatusProcedimento.cs        # Enum de status do POP
-│   ├── Exceptions/
-│   │   └── DomainException.cs           # Exceção personalizada de domínio
-│   └── Interfaces/
-│       └── IProcedimentoRepository.cs   # Contrato do repositório
+├── 📂 backend/                          # Pasta do Servidor (.NET 10)
+│   ├── CatalogoPOP.slnx                 # Arquivo da Solução
+│   │
+│   ├── 💎 CatalogoPOP.Domain/
+│   │   ├── Entities/
+│   │   │   └── ProcedimentoOperacional.cs   # Entidade principal
+│   │   └── ...
+│   │
+│   ├── 📐 CatalogoPOP.Application/
+│   │   ├── Commands/
+│   │   ├── Queries/
+│   │   └── ...
+│   │
+│   ├── 🔌 CatalogoPOP.Infrastructure/
+│   │   ├── Persistence/
+│   │   ├── Migrations/
+│   │   └── ...
+│   │
+│   ├── 📡 CatalogoPOP.API/
+│   │   ├── Program.cs                       # Endpoints
+│   │   └── appsettings.json                 # Configurações
+│   │
+│   └── 🧪 CatalogoPOP.Tests/
+│       └── Domain/
+│           └── ProcedimentoOperacionalTests.cs
 │
-├── 📐 CatalogoPOP.Application/
-│   ├── Commands/
-│   │   └── CriarProcedimentoCommand.cs  # Intenção de criar um POP
-│   ├── Handlers/
-│   │   └── CriarProcedimentoCommandHandler.cs  # Lógica de criação
-│   ├── Queries/
-│   │   └── ObterTodosProcedimentosQuery.cs      # Query de leitura
-│   ├── DTOs/
-│   │   └── ProcedimentoDTO.cs           # Objeto de transferência de dados
-│   ├── Mappings/
-│   │   └── MappingProfile.cs            # Perfil AutoMapper
-│   ├── Validators/
-│   │   └── CriarProcedimentoValidator.cs # Regras de validação (FluentValidation)
-│   └── DependencyInjection.cs           # Registro dos serviços da camada
-│
-├── 🔌 CatalogoPOP.Infrastructure/
-│   ├── Persistence/
-│   │   └── ApplicationDbContext.cs      # Contexto do EF Core
-│   ├── Repositories/
-│   │   └── ProcedimentoRepository.cs   # Implementação do repositório SQL
-│   ├── Migrations/
-│   │   └── InitialCreate.cs            # Script de criação do banco de dados
-│   └── DependencyInjection.cs          # Registro dos serviços de infraestrutura
-│
-├── 📡 CatalogoPOP.API/
-│   ├── Program.cs                       # Ponto de entrada · Endpoints · Middlewares
-│   └── appsettings.json                 # Configurações (Connection String, JWT)
-│
-└── 🧪 CatalogoPOP.Tests/
-    └── Domain/
-        └── ProcedimentoOperacionalTests.cs  # 22 testes unitários
+└── 📂 frontend/                         # Pasta da Interface (em breve)
 ```
 
 ---
@@ -384,7 +369,7 @@ cd projeto-crud-catalogopop
 
 ### 2. Configurar o banco de dados
 
-Edite o arquivo `CatalogoPOP.API/appsettings.json` com suas credenciais do PostgreSQL:
+Edite o arquivo `backend/CatalogoPOP.API/appsettings.json` com suas credenciais do PostgreSQL:
 
 ```json
 "ConnectionStrings": {
@@ -395,13 +380,13 @@ Edite o arquivo `CatalogoPOP.API/appsettings.json` com suas credenciais do Postg
 ### 3. Aplicar as Migrations (criar as tabelas)
 
 ```bash
-dotnet ef database update --startup-project CatalogoPOP.API/CatalogoPOP.API.csproj
+dotnet ef database update --startup-project backend/CatalogoPOP.API/CatalogoPOP.API.csproj
 ```
 
 ### 4. Executar a API
 
 ```bash
-dotnet run --project CatalogoPOP.API/CatalogoPOP.API.csproj
+dotnet run --project backend/CatalogoPOP.API/CatalogoPOP.API.csproj
 ```
 
 A API estará disponível em `http://localhost:5148`.
@@ -415,7 +400,7 @@ Abra no navegador: **[http://localhost:5148/scalar/v1](http://localhost:5148/sca
 ### 6. Executar os testes
 
 ```bash
-dotnet test
+dotnet test backend/CatalogoPOP.Tests/CatalogoPOP.Tests.csproj
 ```
 
 ---

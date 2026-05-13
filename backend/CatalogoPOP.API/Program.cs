@@ -64,7 +64,17 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
-// 5. Scrutor.
+// 6. Configura CORS para permitir chamadas do Frontend.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 builder.Services.Scan(scan => scan
     .FromAssemblyOf<Program>()
     .AddClasses()
@@ -74,6 +84,9 @@ builder.Services.Scan(scan => scan
 var app = builder.Build();
 
 // --- CONFIGURAÇÃO DO PIPELINE HTTP (MIDDLEWARES) ---
+
+// 1. Usa a política de CORS definida acima.
+app.UseCors("AllowFrontend");
 
 // Middleware de tratamento global de erros.
 app.Use(async (context, next) =>
