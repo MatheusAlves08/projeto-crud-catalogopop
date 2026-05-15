@@ -21,17 +21,17 @@ public class ProcedimentoRepositorySql : IProcedimentoRepository
 
     public async Task<IEnumerable<ProcedimentoOperacional>> ObterTodosAsync()
     {
-        // AsNoTracking() faz a consulta ser mais rápida porque diz ao EF para não "vigiar" os objetos
-        // Ideal para consultas apenas de leitura (Read-only)
+        // Filtramos para não trazer procedimentos marcados como excluídos (Soft Delete)
         return await _context.Procedimentos
             .AsNoTracking()
+            .Where(p => !p.IsDeleted)
             .ToListAsync();
     }
 
     public async Task<ProcedimentoOperacional?> ObterPorIdAsync(Guid id)
     {
-        // Busca o procedimento pela chave primária (Id)
-        return await _context.Procedimentos.FirstOrDefaultAsync(p => p.Id == id);
+        // Busca o procedimento pela chave primária, garantindo que não esteja excluído
+        return await _context.Procedimentos.FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
     }
 
     public async Task<bool> ExisteCodigoAsync(string codigo)

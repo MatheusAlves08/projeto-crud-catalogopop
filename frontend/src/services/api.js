@@ -20,10 +20,10 @@ export const popService = {
   getAll: () => api.get('/pops'),
   create: (data) => api.post('/pops', data),
   // Futuros:
-  // getById: (id) => api.get(`/pops/${id}`),
-  // update: (id, data) => api.put(`/pops/${id}`, data),
-  // delete: (id) => api.delete(`/pops/${id}`),
-  // checkCodigo: (codigo) => api.get(`/pops/check-codigo/${codigo}`)
+  getById: (id) => api.get(`/pops/${id}`),
+  update: (id, data) => api.put(`/pops/${id}`, data),
+  delete: (id) => api.delete(`/pops/${id}`),
+  checkCodigo: (codigo) => api.get(`/pops/check-codigo/${codigo}`)
 };
 
 export default api;

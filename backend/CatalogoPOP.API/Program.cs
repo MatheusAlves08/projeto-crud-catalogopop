@@ -144,4 +144,34 @@ apiGroup.MapGet("/", async (IMediator mediator) =>
 })
 .WithName("ObterTodos");
 
+apiGroup.MapGet("/{id:guid}", async (Guid id, IMediator mediator) =>
+{
+    var result = await mediator.Send(new ObterProcedimentoPorIdQuery(id));
+    return result is not null ? Results.Ok(result) : Results.NotFound();
+})
+.WithName("ObterPorId");
+
+apiGroup.MapPut("/{id:guid}", async (Guid id, AtualizarProcedimentoCommand command, IMediator mediator) =>
+{
+    if (id != command.Id) return Results.BadRequest("ID divergente");
+    var result = await mediator.Send(command);
+    return result ? Results.NoContent() : Results.NotFound();
+})
+.WithName("AtualizarProcedimento");
+
+apiGroup.MapDelete("/{id:guid}", async (Guid id, IMediator mediator) =>
+{
+    var result = await mediator.Send(new ExcluirProcedimentoCommand(id));
+    return result ? Results.NoContent() : Results.NotFound();
+})
+.WithName("ExcluirProcedimento");
+
+apiGroup.MapGet("/check-codigo/{codigo}", async (string codigo, IMediator mediator) =>
+{
+    var exists = await mediator.Send(new ObterProcedimentoPorCodigoQuery(codigo));
+    if (exists) return Results.Conflict(new { error = "Código já cadastrado" });
+    return Results.Ok();
+})
+.WithName("VerificarCodigo");
+
 app.Run();

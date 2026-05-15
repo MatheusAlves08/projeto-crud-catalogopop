@@ -9,7 +9,8 @@ import {
   Info,
   History,
   Trash2,
-  Calendar
+  Calendar,
+  Files
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { popService } from '../../services/api';
@@ -43,6 +44,36 @@ const ProcedimentoForm = () => {
     { version: 'v2.1', date: '10/01/2025', current: true },
   ];
 
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  useEffect(() => {
+    if (isEdit) {
+      fetchPop();
+    }
+  }, [id]);
+
+  const fetchPop = async () => {
+    try {
+      setLoading(true);
+      const response = await popService.getById(id);
+      const pop = response.data;
+      setFormData({
+        codigo: pop.codigo,
+        titulo: pop.titulo,
+        descricao: pop.descricao,
+        departamento: pop.departamento,
+        responsavel: pop.responsavel,
+        status: pop.status,
+        versao: pop.versao,
+        dataRevisao: pop.dataRevisao?.split('T')[0] || ''
+      });
+    } catch (err) {
+      setError("Erro ao carregar dados: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -52,16 +83,17 @@ const ProcedimentoForm = () => {
     }
   };
 
-  const handleBlurCodigo = () => {
-    if (!formData.codigo) return;
+  const handleBlurCodigo = async () => {
+    if (!formData.codigo || isEdit) return;
     
-    // Simulação de checagem de código (backend precisa de endpoint pra isso)
     setCodeCheck({ loading: true, exists: false, checked: false });
-    setTimeout(() => {
-      // Se o código for "POP-003", simulamos que já existe (como na imagem)
-      const exists = formData.codigo === 'POP-003';
-      setCodeCheck({ loading: false, exists, checked: true });
-    }, 800);
+    try {
+      await popService.checkCodigo(formData.codigo);
+      setCodeCheck({ loading: false, exists: false, checked: true });
+    } catch (err) {
+      // Se o backend retornar erro (como 409 Conflict), assumimos que existe
+      setCodeCheck({ loading: false, exists: true, checked: true });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -70,18 +102,44 @@ const ProcedimentoForm = () => {
     setError(null);
 
     try {
-      // Converte o enum de departamento para número (como o backend espera)
       const deptMap = { 'Qualidade': 0, 'Producao': 1, 'Logistica': 2, 'Administrativo': 3 };
+      
+      // Prepara os dados limpando campos que o backend não precisa no comando ou que podem dar erro
       const dataToSave = {
-        ...formData,
-        departamento: deptMap[formData.departamento] || 0
+        id: isEdit ? id : undefined,
+        codigo: formData.codigo,
+        titulo: formData.titulo,
+        descricao: formData.descricao,
+        responsavel: formData.responsavel,
+        status: formData.status,
+        departamento: typeof formData.departamento === 'string' 
+          ? (deptMap[formData.departamento] ?? 0) 
+          : formData.departamento
       };
 
-      await popService.create(dataToSave);
+      if (isEdit) {
+        await popService.update(id, dataToSave);
+      } else {
+        await popService.create(dataToSave);
+      }
+
       setSuccess(true);
       setTimeout(() => navigate('/procedimentos'), 2000);
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      setLoading(true);
+      await popService.delete(id);
+      navigate('/procedimentos');
+    } catch (err) {
+      setError("Erro ao excluir: " + err.message);
+      setShowDeleteModal(false);
     } finally {
       setLoading(false);
     }
@@ -161,17 +219,6 @@ const ProcedimentoForm = () => {
                 <div className="feedback-message error">
                   <AlertCircle size={16} />
                   <span>Código já cadastrado! Um procedimento com este código já existe no sistema.</span>
-                </div>
-              )}
-
-              {codeCheck.exists && (
-                <div className="existing-pop-card card">
-                  <Files size={24} className="icon" />
-                  <div className="info">
-                    <strong>{formData.codigo} - Controle de Estoque</strong>
-                    <span>Departamento: Logística | Status: Aprovado | Versão: v3.0</span>
-                    <a href="#">Ver procedimento existente ↗</a>
-                  </div>
                 </div>
               )}
             </div>
@@ -264,7 +311,7 @@ const ProcedimentoForm = () => {
 
         <div className="form-actions">
           {isEdit && (
-            <button type="button" className="btn-outline-danger">
+            <button type="button" className="btn-outline-danger" onClick={() => setShowDeleteModal(true)}>
               <Trash2 size={18} />
               Excluir Procedimento
             </button>
@@ -279,6 +326,31 @@ const ProcedimentoForm = () => {
           </div>
         </div>
       </form>
+
+      <AnimatePresence>
+        {showDeleteModal && (
+          <div className="modal-overlay">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="modal card"
+            >
+              <div className="modal-header">
+                <AlertCircle size={24} className="text-danger" />
+                <h3>Excluir Procedimento</h3>
+              </div>
+              <p>Tem certeza que deseja excluir o procedimento <strong>{formData.codigo}</strong>? Esta ação não pode ser desfeita.</p>
+              <div className="modal-actions">
+                <button className="btn-ghost" onClick={() => setShowDeleteModal(false)}>Cancelar</button>
+                <button className="btn-danger" onClick={handleDelete} disabled={loading}>
+                  {loading ? 'Excluindo...' : 'Confirmar Exclusão'}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {isEdit && (
         <div className="version-history-section animate-fade-in" style={{ marginTop: '2rem' }}>
@@ -545,6 +617,56 @@ const ProcedimentoForm = () => {
 
         .timeline-content .version { font-weight: 700; font-size: 0.95rem; }
         .timeline-content .date { font-size: 0.8rem; color: var(--text-muted); }
+        /* Modal Styles */
+        .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.4);
+          backdrop-filter: blur(4px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+        }
+
+        .modal {
+          width: 90%;
+          max-width: 450px;
+          padding: 2rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+
+        .modal-header {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .modal-header h3 { margin: 0; font-size: 1.25rem; }
+
+        .modal-actions {
+          display: flex;
+          justify-content: flex-end;
+          gap: 1rem;
+        }
+
+        .btn-danger {
+          background: var(--danger);
+          color: white;
+          border: none;
+          padding: 0.75rem 1.5rem;
+          border-radius: var(--radius-md);
+          font-weight: 600;
+          cursor: pointer;
+        }
+
+        .btn-danger:hover { background: #b91c1c; }
+        .text-danger { color: var(--danger); }
       `}} />
     </Layout>
   );

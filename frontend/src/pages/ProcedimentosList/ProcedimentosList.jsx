@@ -45,6 +45,22 @@ const ProcedimentosList = () => {
     }
   };
 
+  const getDepartamentoLabel = (dept) => {
+  const map = { 0: 'Qualidade', 1: 'Produção', 2: 'Logística', 3: 'Administrativo' };
+  return map[dept] ?? dept;
+};
+
+  const handleDelete = async (id, codigo) => {
+    if (window.confirm(`Tem certeza que deseja excluir o procedimento ${codigo}?`)) {
+      try {
+        await popService.delete(id);
+        fetchPops();
+      } catch (err) {
+        alert("Erro ao excluir: " + err.message);
+      }
+    }
+  };
+
   return (
     <Layout title="Catálogo de Procedimentos Operacionais Padrão">
       <div className="list-actions">
@@ -59,6 +75,7 @@ const ProcedimentosList = () => {
             <option value="Qualidade">Qualidade</option>
             <option value="Producao">Produção</option>
             <option value="Logistica">Logística</option>
+            <option value="Administrativo">Administrativo</option>
           </select>
 
           <select className="filter-select">
@@ -113,10 +130,18 @@ const ProcedimentosList = () => {
                   <td>{pop.responsavel}</td>
                   <td>
                     <div className="action-btns">
-                      <button className="action-btn edit" title="Editar">
+                      <button 
+                        className="action-btn edit" 
+                        title="Editar"
+                        onClick={() => navigate(`/procedimentos/editar/${pop.id}`)}
+                      >
                         <Edit2 size={16} />
                       </button>
-                      <button className="action-btn delete" title="Excluir">
+                      <button 
+                        className="action-btn delete" 
+                        title="Excluir"
+                        onClick={() => handleDelete(pop.id, pop.codigo)}
+                      >
                         <Trash2 size={16} />
                       </button>
                     </div>
