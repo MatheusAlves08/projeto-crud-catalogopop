@@ -25,10 +25,11 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Se o token expirar ou for inválido, podemos limpar e redirecionar
+    // Se o token expirar ou for inválido, limpa o estado e redireciona para login
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('username');
+      window.location.href = '/login';
     }
     const message = error.response?.data?.error || 'Erro inesperado no servidor.';
     return Promise.reject(new Error(message));
