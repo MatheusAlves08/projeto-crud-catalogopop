@@ -69,7 +69,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins("http://localhost:5173")
               .AllowAnyMethod()
               .AllowAnyHeader();
     });
@@ -126,9 +126,47 @@ app.UseRateLimiter();
 
 // --- ENDPOINTS (MINIMAL APIs) ---
 
+// Endpoint de Login para Autenticação JWT
+app.MapPost("/api/auth/login", ([FromBody] LoginRequest request, IConfiguration configuration) =>
+{
+    // Credenciais administrativas simuladas
+    if (request.Username == "admin" && request.Password == "admin123")
+    {
+        var jwtSettings = configuration.GetSection("JwtSettings");
+        var secret = jwtSettings["Secret"]!;
+        var issuer = jwtSettings["Issuer"];
+        var audience = jwtSettings["Audience"];
+        var expiryHours = double.Parse(jwtSettings["ExpiresInHours"] ?? "8");
+
+        var tokenHandler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(secret);
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new System.Security.Claims.ClaimsIdentity(new[] 
+            { 
+                new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, request.Username),
+                new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Role, "Admin")
+            }),
+            Expires = DateTime.UtcNow.AddHours(expiryHours),
+            Issuer = issuer,
+            Audience = audience,
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        };
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        var tokenString = tokenHandler.WriteToken(token);
+
+        return Results.Ok(new { Token = tokenString, Username = request.Username });
+    }
+
+    return Results.Unauthorized();
+})
+.WithName("Login")
+.WithTags("Autenticação");
+
 var apiGroup = app.MapGroup("/api/pops")
     .WithTags("Procedimentos Operacionais Padrão (POP)")
-    .RequireRateLimiting("fixed");
+    .RequireRateLimiting("fixed")
+    .RequireAuthorization();
 
 apiGroup.MapPost("/", async (CriarProcedimentoCommand command, IMediator mediator) =>
 {
@@ -175,3 +213,5 @@ apiGroup.MapGet("/check-codigo/{codigo}", async (string codigo, IMediator mediat
 .WithName("VerificarCodigo");
 
 app.Run();
+
+public record LoginRequest(string Username, string Password);

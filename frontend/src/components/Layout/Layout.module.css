@@ -1,0 +1,17 @@
+.appContainer {
+  display: flex;
+  min-height: 100vh;
+}
+
+.mainContent {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  padding-bottom: 2rem;
+  background-color: var(--bg-main);
+}
+
+.pageContainer {
+  padding: 0 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
