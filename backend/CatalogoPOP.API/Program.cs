@@ -77,7 +77,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.Scan(scan => scan
     .FromAssemblyOf<Program>()
-    .AddClasses()
+    .AddClasses(classes => classes.Where(t => t.Name != "LoginRequest"))
     .AsImplementedInterfaces()
     .WithScopedLifetime());
 
